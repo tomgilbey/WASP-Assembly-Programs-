@@ -1,0 +1,187 @@
+MOV AX, 0d00
+MOV [count], AX
+call randomnumbergen
+call input
+HALT
+ 
+userinput1: DC.W 0d00
+userinput2: DC.W 0d00
+totalinput: DC.W 0d00
+randomnumber: DC.W 0d00
+count: DC.W 0d00
+//Initialising variables
+input:
+MOV AX, 0d00
+MOV [totalinput], AX
+MOV AX,[count]
+ADD AX, 0d01
+MOV [count], AX
+call getcharbx
+MOV [userinput1], BX
+call getcharbx
+MOV [userinput2], BX
+MOV BX, [userinput1]
+ADD BX, 0x30
+call writebx
+MOV BX, [userinput2]
+ADD BX, 0x30
+call writebx
+MOV BX, 0x0A
+call writebx
+MOV AX, [userinput1]
+CMP AX, 0d01
+JEQ add10
+JNE addsingle
+RET
+//Function which gets the users input and writes it onto the screen
+compare:
+MOV AX, [randomnumber]
+MOV BX, [totalinput]
+CMP AX, BX
+JEQ correct
+JL lower
+JGE higher
+RET
+//Function that compares user input and random number. 
+randomnumbergen:
+MOV AX, [0x00FF]
+AND AX,0x0F
+ADD AX, 0x01
+MOV [randomnumber], AX
+CMP AX, 0x0A
+ 
+RET
+//Function to generate a number randomly.
+ 
+ 
+ 
+getcharbx:
+wait:
+MOV AX,[0xF5]
+CMP AX,0x0
+JEQ wait
+MOV BX, [0xF3]
+MOV AX, 0x00
+MOV [0xF5], AX
+SUB BX, 0x30
+RET
+//Function to get the value inputted's ASCII character.
+writebx:
+MOV AX,[0xF2]
+CMP AX,0x0 
+JNE writebx
+MOV [0xF0],BX
+MOV BX,0x1 
+MOV [0xF2],BX
+RET 
+//Function to write whatever is in bx to the output
+add10:
+MOV AX, 0d10
+MOV [totalinput], AX
+JMP addsingle
+RET
+//function to add 10 to get the numbers ascii value
+addsingle:
+MOV AX, [userinput2]
+MOV BX, [totalinput]
+ADD AX, BX
+MOV [totalinput], AX
+JMP compare
+ //function to add 10 to get the numbers ascii value
+ 
+correct:
+MOV BX, 0x43
+CALL writebx
+MOV BX, 0x4F
+CALL writebx
+MOV BX, 0x52
+CALL writebx
+MOV BX, 0x52
+CALL writebx
+MOV BX, 0x45
+CALL writebx
+MOV BX, 0x43
+CALL writebx
+MOV BX, 0x54
+CALL writebx
+MOV BX, 0x2E
+CALL writebx
+MOV BX, 0x20
+CALL writebx
+ 
+MOV BX, 0x59
+CALL writebx
+MOV BX, 0x6F
+CALL writebx
+MOV BX, 0x75
+CALL writebx
+MOV BX, 0x20
+CALL writebx
+ 
+MOV BX, 0x6D
+CALL writebx
+MOV BX, 0x61
+CALL writebx
+MOV BX, 0x64
+CALL writebx
+MOV BX, 0x65
+CALL writebx
+MOV BX, 0x20
+CALL writebx
+ 
+MOV BX, [count]
+ADD BX, 0x30
+CALL writebx
+MOV BX, 0x20
+CALL writebx
+ 
+MOV BX, 0x67
+CALL writebx
+MOV BX, 0x75
+CALL writebx
+MOV BX, 0x65
+CALL writebx
+MOV BX, 0x73
+CALL writebx
+MOV BX, 0x73
+CALL writebx
+MOV BX, 0x65
+CALL writebx
+MOV BX, 0x73
+CALL writebx
+MOV BX, 0x2E
+CALL writebx
+HALT
+ //function to display a correct message and tell the user how many guesses they used.
+lower:
+MOV BX, 0x4C
+CALL writebx
+MOV BX, 0x4F
+CALL writebx
+MOV BX, 0x57
+CALL writebx
+MOV BX, 0x45
+CALL writebx
+MOV BX, 0x52
+CALL writebx
+MOV BX, 0x0A
+CALL writebx
+JMP input
+//Function to output the word lower
+higher:
+MOV BX, 0x48
+CALL writebx
+MOV BX, 0x49
+CALL writebx
+MOV BX, 0x47
+CALL writebx
+MOV BX, 0x48
+CALL writebx
+MOV BX, 0x45
+CALL writebx
+MOV BX, 0x52
+CALL writebx
+MOV BX, 0x0A
+CALL writebx
+JMP input
+//Function to output the word higher
