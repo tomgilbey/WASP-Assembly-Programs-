@@ -1,0 +1,144 @@
+MOV AX, 0x00
+MOV [input1], AX
+MOV [input2], AX
+MOV [input3], AX
+MOV [input4], AX
+MOV [result], AX
+MOV BX, 0x0A
+CALL writebx
+CALL getcharbx
+MOV [input1], BX
+CALL writebx
+CALL getcharbx
+MOV [input2], BX
+CALL writebx
+CALL getcharbx
+MOV [input3], BX
+CALL writebx
+CALL getcharbx
+MOV [input4], BX
+CALL writebx
+JMP digit1
+ 
+digit1:
+MOV AX, [input1]
+CMP AX, 0x31
+JEQ ADD8
+CMP AX, 0x30
+JEQ digit2
+JMP error
+ 
+digit2:
+MOV AX, [input2]
+CMP AX, 0x31
+JEQ ADD4
+CMP AX, 0x30
+JEQ digit3
+JMP error
+ 
+digit3:
+MOV AX, [input3]
+CMP AX, 0x31
+JEQ ADD2
+CMP AX, 0x30
+JEQ digit4
+JMP error
+ 
+digit4:
+MOV AX, [input4]
+CMP AX, 0x31
+JEQ ADD1
+CMP AX, 0x30
+JEQ finish
+JMP error
+ 
+ADD8:
+MOV AX, 0x08
+MOV BX, [result]
+ADD AX, BX
+MOV [result], AX
+JMP digit2
+ 
+ 
+ADD4:
+MOV AX, 0x04
+MOV BX, [result]
+ADD AX, BX
+MOV [result], AX
+JMP digit3
+ 
+ADD2:
+MOV AX, 0x02
+MOV BX, [result]
+ADD AX, BX
+MOV [result], AX
+JMP digit4
+ 
+ADD1:
+MOV AX, 0x01
+MOV BX, [result]
+ADD AX, BX
+MOV [result], AX
+JMP finish
+ 
+ 
+finish:
+MOV AX, [result]
+CMP AX, 0x0A
+JL output1
+JGE output2
+ 
+ 
+output1:
+MOV BX, 0x0A
+CALL writebx
+MOV BX, [result]
+ADD BX, 0x30
+CALL writebx
+HALT
+ 
+output2:
+MOV BX, 0x0A
+CALL writebx
+MOV BX, 0x31
+CALL writebx
+MOV BX, [result]
+ADD BX, 0x26
+CALL writebx
+HALT
+ 
+error:
+MOV BX, 0x0A
+CALL writebx
+MOV BX, 0x45
+CALL writebx
+ 
+ 
+HALT
+ 
+input1: DC.W 0x00
+input2: DC.W 0x00
+input3: DC.W 0x00
+input4: DC.W 0x00
+result: DC.W 0x00
+//INITIALISING VARIABLES
+ 
+getcharbx:
+wait:
+MOV AX,[0xF5]
+CMP AX,0x0
+JEQ wait
+MOV BX, [0xF3]
+MOV AX, 0x00
+MOV [0xF5], AX
+RET
+//THE CODE ABOVE IS A FUNCTION TO CHECK THERE IS SOMETHING TO READ, THEN PUT THE ASCII INTO BX, SET THE STATUS BACK TO 0 AND RETURN.
+writebx:
+MOV AX,[0xF2] 
+CMP AX,0x0 
+JNE writebx 
+MOV [0xF0],BX
+MOV BX,0x1 
+MOV [0xF2],BX
+RET
+//THE CODE ABOVE IS A FUNCTION USED TO WRITE WHATEVER IS STORED IN bx TO THE OUTPUT//
